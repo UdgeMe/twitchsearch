@@ -47,9 +47,17 @@ class GameModel(BaseModel):
 
 @app.post("/save-game-query/")
 def save_game_query(game: GameModel):
-    print(game.id)
-    print(game.name)
-    print(f'https://static-cdn.jtvnw.net/ttv-boxart/{game.id}-600x800.jpg')
+    from pymongo import MongoClient
+    client = MongoClient("mongodb://localhost:27017")
+    db = client.twitch
+    if db.games.find_one({"id": game.id}):
+        return 'game already in db'
+
+    db.games.insert_one({
+        "id": game.id,
+        "name": game.name,
+    })
+    return 'game saved'
 
 @app.get("/search/{query}")
 def search(query: str):

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="game-search">
     <input
       v-model="query"
       @input="fetchGames"
@@ -60,6 +60,10 @@ export default {
 </script>
 
 <style>
+.game-search {
+  position: relative;
+  width: 300px;
+}
 input {
   width: 300px;
   padding: 8px;
