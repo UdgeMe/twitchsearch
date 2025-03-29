@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from pydantic import BaseModel
 import requests
 import os
 load_dotenv()
@@ -39,6 +40,16 @@ def search(query: str):
     search_game_response_data = search_game_response.json().get("data", [])
     
     return search_game_response_data
+
+class GameModel(BaseModel):
+    id: int
+    name: str
+
+@app.post("/save-game-query/")
+def save_game_query(game: GameModel):
+    print(game.id)
+    print(game.name)
+    print(f'https://static-cdn.jtvnw.net/ttv-boxart/{game.id}-600x800.jpg')
 
 @app.get("/search/{query}")
 def search(query: str):

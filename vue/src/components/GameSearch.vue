@@ -1,5 +1,5 @@
 <template>
-  <div class="game-search">
+  <div>
     <input
       v-model="query"
       @input="fetchGames"
@@ -18,7 +18,7 @@
 import { ref } from "vue";
 
 export default {
-  setup(_, { emit }) {
+  setup() {
     const query = ref("");
     const games = ref([]);
 
@@ -35,24 +35,33 @@ export default {
       games.value = data || [];
     };
 
-    const selectGame = (game) => {
+    const selectGame = async (game) => {
       query.value = game.name;
       games.value = [];
-      emit("gameSelected", game);
+
+      await saveGameQuery(game);
     };
 
+    const saveGameQuery = async (game) => {
+        await fetch(
+          'http://localhost:8000/save-game-query/',
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(game),
+          },
+        );
+    };
     return { query, games, fetchGames, selectGame };
   },
 };
 </script>
 
 <style>
-.game-search {
-  position: relative;
-  width: 300px;
-}
 input {
-  width: 100%;
+  width: 300px;
   padding: 8px;
 }
 ul {
