@@ -28,6 +28,18 @@ pip install "fastapi[standard]"
 git clone git@github.com:UdgeMe/twitchsearch.git
 ```
 
+# Installer npm
+```
+sudo apt install nodejs
+sudo apt install npm
+```
+
+# Installer les dépendances pour le front Vue
+```
+cd twitchsearch/vue
+npm install
+```
+
 # Lancer l'app fastapi en local
 ```
 fastapi dev main.py
