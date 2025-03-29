@@ -28,6 +28,10 @@ def get_access_token():
     data = response.json()
     return data.get("access_token")
 
+def get_db_connection():
+    from pymongo import MongoClient
+    client = MongoClient("mongodb://localhost:27017")
+    return client.twitch
 
 @app.get("/search-game/{query}")
 def search(query: str):
@@ -47,9 +51,8 @@ class GameModel(BaseModel):
 
 @app.post("/save-game-query/")
 def save_game_query(game: GameModel):
-    from pymongo import MongoClient
-    client = MongoClient("mongodb://localhost:27017")
-    db = client.twitch
+    db = get_db_connection()
+
     if db.games.find_one({"id": game.id}):
         return 'game already in db'
 
@@ -58,6 +61,19 @@ def save_game_query(game: GameModel):
         "name": game.name,
     })
     return 'game saved'
+
+@app.get("/my-games/")
+def my_games():
+    
+    db = get_db_connection()
+    return [
+        {
+            'id': game['id'],
+            'name': game['name'],
+            'img': f'https://static-cdn.jtvnw.net/ttv-boxart/{game['id']}-100x130.jpg'
+        }
+        for game in db.games.find().sort("name")
+    ]
 
 @app.get("/search/{query}")
 def search(query: str):

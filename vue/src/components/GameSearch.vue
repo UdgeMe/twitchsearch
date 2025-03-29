@@ -68,7 +68,7 @@ input {
   width: 300px;
   padding: 8px;
 }
-ul {
+.game-search ul {
   position: absolute;
   width: 100%;
   background: white;
@@ -77,12 +77,12 @@ ul {
   padding: 0;
   margin: 0;
 }
-li {
+.game-search li {
   padding: 8px;
   cursor: pointer;
   color: #000000;
 }
-li:hover {
+.game-search li:hover {
   background: #f0f0f0;
 }
 </style>
