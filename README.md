@@ -65,11 +65,16 @@ Une fois le front lancé, on pourra accéder à l'application sur http://localho
 # Résultat attendu
 ![alt text](image.png)
 
-( 1 ) Champ de recherche (valeur exacte malheureusement - limitation de l'API Twitch)
-    On recherche un jeu et une fois proposé dans l'autocomplete on clique dessus pour l'ajouter à sa liste
+( 1 ) Champ de recherche (valeur exacte malheureusement - limitation de l'API Twitch).
 
-( 2 ) Liste des jeux surveillés
-    On retrouve la liste des jeux surveillés, on peut cliquer sur chaque jeu pour charger la liste des vidéos associées
+On recherche un jeu et une fois proposé dans l'autocomplete on clique dessus pour l'ajouter à sa liste.
 
-( 3 ) Liste des vidéos associées au jeu sélectionné à gauche
-    Cette liste se refresh via websockets toutes les deux minutes
+
+( 2 ) Liste des jeux surveillés.
+
+On retrouve la liste des jeux surveillés, on peut cliquer sur chaque jeu pour charger la liste des vidéos associées. On pourra supprimer un jeu "surveillé" via le "bouton" X associé au jeu.
+
+
+( 3 ) Liste des vidéos associées au jeu sélectionné à gauche.
+
+Cette liste se refresh via websockets toutes les deux minutes.
