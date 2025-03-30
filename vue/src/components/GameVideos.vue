@@ -7,9 +7,14 @@
     <ul v-if="!loading && videos.length > 0">
       <li v-for="video in videos" :key="video.id">
         <a :href="video.url" target="_blank">
-          <img :src="video.thumbnail_url" :alt="video.title" class="video-thumbnail" />
+          <img
+            :src="video.thumbnail_url.replace('%{width}', '200').replace('%{height}', '100')"
+            alt="Image non disponible"
+            class="video-thumbnail"
+          />
+          <p>{{ video.title }}</p>
+          <p>{{ `@${video.user_name}` }}</p>
         </a>
-        <p>{{ video.title }}</p>
       </li>
     </ul>
 
@@ -73,7 +78,22 @@ export default {
 </script>
 
 <style scoped>
-.game-videos ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
-.game-videos li { width: 200px; }
-.video-thumbnail { width: 100%; border-radius: 5px; }
+.game-videos ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.game-videos li {
+  width: 200px;
+}
+.video-thumbnail {
+  display: block;
+  width: 100%;
+  height: 100px;
+  border-radius: 5px;
+  border: 1px solid #555555;
+  color: #cccccc;
+}
 </style>

@@ -61,3 +61,15 @@ fastapi dev main.py
 npm run dev
 ```
 Une fois le front lancé, on pourra accéder à l'application sur http://localhost:5173/
+
+# Résultat attendu
+![alt text](image.png)
+
+( 1 ) Champ de recherche (valeur exacte malheureusement - limitation de l'API Twitch)
+    On recherche un jeu et une fois proposé dans l'autocomplete on clique dessus pour l'ajouter à sa liste
+
+( 2 ) Liste des jeux surveillés
+    On retrouve la liste des jeux surveillés, on peut cliquer sur chaque jeu pour charger la liste des vidéos associées
+
+( 3 ) Liste des vidéos associées au jeu sélectionné à gauche
+    Cette liste se refresh via websockets toutes les deux minutes
