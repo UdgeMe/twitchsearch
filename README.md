@@ -23,7 +23,7 @@ python3.12 -m venv .venv3.12
 
 # Installation des librairies python
 ```
-pip install fastapi pymongo requests python-dotenv
+pip install fastapi pymongo requests python-dotenv websockets
 pip install "fastapi[standard]"
 ```
 

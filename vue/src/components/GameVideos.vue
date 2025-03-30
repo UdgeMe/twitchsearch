@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { ref, watch } from "vue";
+import { onUnmounted, ref, watch } from "vue";
 
 export default {
   props: {
@@ -29,28 +29,43 @@ export default {
     const videos = ref([]);
     const loading = ref(false);
     const error = ref(null);
+    // On va utiliser un WebSocket pour que le back mette à jour régulièrement
+    // les résultats
+    let socket = null;
 
-    // méthode de fetch des vidéos pour un id de jeu donné
-    const fetchVideos = async () => {
-      if (!props.selectedGameId) return;
+    const connectWebSocket = () => {
+      if (socket) {
+        // Si jamais il y avait déjà un WebSocket on le ferme
+        socket.close();
+      }
 
+      // On réinitialise les valeurs du composant et on instancie le websocket avec le bon ID de jeu
       loading.value = true;
       error.value = null;
+      socket = new WebSocket(`ws://localhost:8000/ws/get-videos/${props.selectedGameId}`);
 
-      try {
-        const response = await fetch(`http://localhost:8000/get-videos/${props.selectedGameId}`);
-        if (!response.ok) throw new Error("Erreur lors de la récupération des vidéos");
-
-        const data = await response.json();
-        videos.value = data;
-      } catch (err) {
-        error.value = err.message;
-      } finally {
+      socket.onerror = () => {
+        error.value = 'Une erreur est survenue';
+      };
+      socket.onmessage = (event) => {
+        // Récupération de la liste des vidéos
+        videos.value = JSON.parse(event.data);
         loading.value = false;
-      }
+      };
     };
 
-    watch(() => props.selectedGameId, fetchVideos);
+    // Lorsque l'id de jeu sélectionné change, on relance un WebSocket
+    watch(() => props.selectedGameId, (gameId, prevGameId) => {
+      if (gameId && prevGameId !== gameId) {
+        connectWebSocket();
+      }
+    });
+
+    onUnmounted(() => {
+      if (socket) {
+        socket.close();
+      }
+    });
 
     return { videos, loading, error };
   },

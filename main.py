@@ -1,9 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from pydantic import BaseModel
 import requests
 import os
+import asyncio
 load_dotenv()
 app = FastAPI()
 
@@ -75,13 +76,30 @@ def my_games():
         for game in db.games.find().sort("name")
     ]
 
-@app.get("/get-videos/{gameId}")
-def search(gameId: str):
+active_connections = []
+@app.websocket("/ws/get-videos/{gameId}")
+async def websocket_videos(websocket: WebSocket, gameId: str):
+    await websocket.accept()
+    active_connections.append(websocket)
+
+    try:
+        while True:
+            videos = await fetch_videos(gameId)
+            await websocket.send_json(videos)
+            await asyncio.sleep(120) 
+    except WebSocketDisconnect:
+        active_connections.remove(websocket)
+
+async def fetch_videos(gameId: str):
     headers = {
         "Client-ID": os.getenv("TWITCH_CLIENT"),
         "Authorization": f"Bearer {get_access_token()}"
     }
     params = {"game_id": gameId, "type": "all"}
-    response = requests.get("https://api.twitch.tv/helix/videos", headers=headers, params=params)
+    response = requests.get(
+        "https://api.twitch.tv/helix/videos",
+        headers=headers,
+        params=params,
+    )
     
     return response.json().get("data", [])
