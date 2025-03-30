@@ -36,7 +36,7 @@ export default {
 
     const refreshGames = () => {
       if (gameListRef.value) {
-        gameListRef.value.refreshGames();
+        gameListRef.value.fetchGames();
       }
     };
 

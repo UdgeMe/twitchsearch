@@ -50,8 +50,8 @@ class GameModel(BaseModel):
     id: int
     name: str
 
-@app.post("/save-game-query/")
-def save_game_query(game: GameModel):
+@app.post("/game/")
+def add_game(game: GameModel):
     db = get_db_connection()
 
     if db.games.find_one({"id": game.id}):
@@ -62,6 +62,17 @@ def save_game_query(game: GameModel):
         "name": game.name,
     })
     return 'game saved'
+
+@app.delete("/game/{gameId}")
+def delete_game(gameId: int):
+    db = get_db_connection()
+
+    if db.games.find_one({"id": gameId}) is not None:
+        db.games.delete_one({
+            "id": gameId,
+        })
+
+    return 'game deleted'
 
 @app.get("/my-games/")
 def my_games():

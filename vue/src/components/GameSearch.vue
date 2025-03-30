@@ -2,7 +2,7 @@
   <div class="game-search">
     <input
       v-model="query"
-      @input="fetchGames"
+      v-on:keyup="bounceFetchGames"
       type="text"
       placeholder="Rechercher un jeu..."
     />
@@ -22,6 +22,7 @@ export default {
   setup(_, { emit }) {
     // valeur de la recherche
     const query = ref("");
+    let searchTimeout = null;
     // "liste" des jeux trouvés (Twitch ne fait que de la recherche exacte donc on ne verra qu'un seul jeu a priori...)
     const games = ref([]);
     // erreur éventuelle lors de l'ajout d'un nouveau jeu
@@ -42,20 +43,29 @@ export default {
       games.value = data || [];
     };
 
+    // Quand on tape dans l'input, on attend un peu avant de lancer la recherche
+    const bounceFetchGames = () => {
+      clearTimeout(searchTimeout);
+
+      searchTimeout = setTimeout(() => {
+        fetchGames();
+      }, 500);
+    };
+
     // méthode lors du choix d'un jeu dans la "liste" proposée
     const selectGame = async (game) => {
       query.value = game.name;
       games.value = [];
 
       // appel de l'api pour ajouter le jeu
-      await saveGameQuery(game);
+      await addGame(game);
     };
 
     // méthode d'ajout de jeu dans la base
-    const saveGameQuery = async (game) => {
+    const addGame = async (game) => {
       try {
         const response = await fetch(
-          'http://localhost:8000/save-game-query/',
+          'http://localhost:8000/game/',
           {
             method: "POST",
             headers: {
@@ -75,7 +85,7 @@ export default {
         error.value = err.message;
       }
     };
-    return { query, error, games, fetchGames, selectGame };
+    return { query, error, games, fetchGames, selectGame, bounceFetchGames };
   },
 };
 </script>

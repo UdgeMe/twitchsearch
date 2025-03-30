@@ -3,9 +3,12 @@
     <h2>Liste des Jeux</h2>
 
     <ul v-if="games.length > 0">
-      <li v-for="game in games" :key="game.id" @click="selectOneOfMyGames(game.id)" :class="{ selected: game.id === selectedGameId }">
-        <img :src="game.img" :alt="game.name" class="game-image" />
-        <span>{{ game.name }}</span>
+      <li v-for="game in games" :key="game.id" :class="{ selected: game.id === selectedGameId }">
+        <div @click="selectOneOfMyGames(game.id)" class="game-title-container">
+          <img :src="game.img" :alt="game.name" class="game-image" />
+          <span>{{ game.name }}</span>
+        </div>
+        <span class="delete-game-btn" title="Supprimer le jeu de la liste" @click="deleteGame(game.id)">X</span>
       </li>
     </ul>
 
@@ -30,19 +33,24 @@ export default {
       games.value = await response.json();
     };
 
+    // méthode de suppression d'un jeu dans a liste
+    const deleteGame = async (gameId) => {
+      await fetch(
+        `http://localhost:8000/game/${gameId}`,
+        { method: "DELETE" },
+      );
+      fetchGames();
+    };
+
+
     // méthode exécutée lors du choix d'un jeu dans la liste des jeux surveillés
     const selectOneOfMyGames = (gameId) => {
       emit("gameSelected", gameId);
     };
 
-    // méthode de refresh de la liste des jeux
-    const refreshGames = () => {
-      fetchGames();
-    };
-
     onMounted(fetchGames);
 
-    return { games, selectOneOfMyGames, refreshGames };
+    return { games, selectOneOfMyGames, fetchGames, deleteGame };
   },
 };
 </script>
@@ -64,13 +72,26 @@ li {
   align-items: center;
   gap: 10px;
   margin: 10px 0;
+  position: relative;
+}
+.game-title-container {
+  width: 270px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 10px;
+}
+.delete-game-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
   cursor: pointer;
 }
 
-li:hover:not(.selected) {
+li:hover:not(.selected) .game-title-container {
   background-color: #333333;
 }
-li.selected {
+li.selected .game-title-container {
   background-color: #555555;
 }
 
