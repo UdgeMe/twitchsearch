@@ -11,6 +11,7 @@
         {{ game.name }}
       </li>
     </ul>
+    <p v-if="error">{{ error }}</p>
   </div>
 </template>
 
@@ -18,15 +19,21 @@
 import { ref } from "vue";
 
 export default {
-  setup() {
+  setup(_, { emit }) {
+    // valeur de la recherche
     const query = ref("");
+    // "liste" des jeux trouvés (Twitch ne fait que de la recherche exacte donc on ne verra qu'un seul jeu a priori...)
     const games = ref([]);
+    // erreur éventuelle lors de l'ajout d'un nouveau jeu
+    const error = ref(null);
 
+    // méthode de fetch des jeux en fonction de la recherche
     const fetchGames = async () => {
       if (query.value.length < 2) {
         games.value = [];
         return;
       }
+      error.value = null;
 
       const response = await fetch(
         `http://localhost:8000/search-game/${query.value}`
@@ -35,15 +42,19 @@ export default {
       games.value = data || [];
     };
 
+    // méthode lors du choix d'un jeu dans la "liste" proposée
     const selectGame = async (game) => {
       query.value = game.name;
       games.value = [];
 
+      // appel de l'api pour ajouter le jeu
       await saveGameQuery(game);
     };
 
+    // méthode d'ajout de jeu dans la base
     const saveGameQuery = async (game) => {
-        await fetch(
+      try {
+        const response = await fetch(
           'http://localhost:8000/save-game-query/',
           {
             method: "POST",
@@ -53,13 +64,23 @@ export default {
             body: JSON.stringify(game),
           },
         );
+        if (!response.ok) throw new Error("Erreur lors de l'ajout d'un nouveau jeu");
+        const data = await response.json();
+        if (data === 'game saved') {
+          emit("gameAdded");
+        } else if (data === 'game already in db') {
+          throw new Error("Le jeu est déjà dans votre liste")
+        }
+      } catch (err) {
+        error.value = err.message;
+      }
     };
-    return { query, games, fetchGames, selectGame };
+    return { query, error, games, fetchGames, selectGame };
   },
 };
 </script>
 
-<style>
+<style scoped>
 .game-search {
   position: relative;
   width: 300px;
@@ -68,7 +89,7 @@ input {
   width: 300px;
   padding: 8px;
 }
-.game-search ul {
+ul {
   position: absolute;
   width: 100%;
   background: white;
@@ -77,12 +98,12 @@ input {
   padding: 0;
   margin: 0;
 }
-.game-search li {
+li {
   padding: 8px;
   cursor: pointer;
   color: #000000;
 }
-.game-search li:hover {
+li:hover {
   background: #f0f0f0;
 }
 </style>

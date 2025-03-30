@@ -75,20 +75,13 @@ def my_games():
         for game in db.games.find().sort("name")
     ]
 
-@app.get("/search/{query}")
-def search(query: str):
+@app.get("/get-videos/{gameId}")
+def search(gameId: str):
     headers = {
         "Client-ID": os.getenv("TWITCH_CLIENT"),
         "Authorization": f"Bearer {get_access_token()}"
     }
-    search_game_response = requests.get(f"https://api.twitch.tv/helix/games?name={query}", headers=headers)
-
-    search_game_response_data = search_game_response.json().get("data", [])
-    if not search_game_response_data:
-        return 'game not found'
-    
-    game_id = search_game_response_data[0]['id']
-    params = {"game_id": game_id, "type": "all"}
+    params = {"game_id": gameId, "type": "all"}
     response = requests.get("https://api.twitch.tv/helix/videos", headers=headers, params=params)
     
     return response.json().get("data", [])
